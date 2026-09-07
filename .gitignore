@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Telethon session files (CRÍTICO: contêm o token de login da sua conta)
+*.session
+*.session-journal
+
+# Armazenamento local de dados
+keywords.json

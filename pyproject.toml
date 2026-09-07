@@ -1,0 +1,23 @@
+[project]
+name = "promomonitor"
+version = "0.1.0"
+description = "Bot de monitoramento de promoções no Telegram"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic-settings>=2.15.0",
+    "telethon>=1.44.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.411",
+    "ruff>=0.16.6",
+]
+
+[project.scripts]
+promomonitor = "promomonitor.main:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
