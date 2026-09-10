@@ -1,0 +1,34 @@
+services:
+  bot:
+    image: ghcr.io/reali-705/promomonitor:latest
+    container_name: promo_monitor
+    restart: unless-stopped
+    environment:
+      - TZ=America/Belem
+    env_file:
+      - .env
+    volumes:
+      - ./promo_monitor.session:/app/promo_monitor.session
+      - ./keywords.json:/app/keywords.json
+    
+    # Restrições Físicas (Capped)
+    deploy:
+      resources:
+        limits:
+          # O i7-2600 tem 8 threads. 0.5 equivale a metade do tempo de 1 thread.
+          # Mais do que o suficiente para o event loop do asyncio.
+          cpus: '0.5' 
+          
+          # Corta o processo (OOM Killer) se vazar mais de 128MB.
+          memory: 128M
+          
+    # Gestão de Disco (Log Rotation)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m" # Rotaciona o arquivo quando bater 10 Megabytes
+        max-file: "3"   # Mantém apenas os 3 últimos arquivos (Max total: 30MB)
+
+    # Hardening de Segurança (Drop de Privilégios Dinâmicos)
+    security_opt:
+      - no-new-privileges:true

@@ -223,3 +223,6 @@ __marimo__/
 
 # Armazenamento local de dados
 keywords.json
+
+# Docker
+docker-compose.override.yml
