@@ -1,27 +1,31 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
-
-# Cria um usuário não-root bloqueado para login
-RUN useradd -m -U -s /bin/false appuser
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS build
 
 WORKDIR /app
 
-# Copia as definições de dependências e os metadados exigidos pelo hatchling
-COPY pyproject.toml uv.lock README.md ./
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-# Instala EXCLUSIVAMENTE as dependências de terceiros (cache agressivo de camadas)
+COPY pyproject.toml uv.lock ./
+
 RUN uv sync --frozen --no-dev --no-install-project
 
-# Copia o código-fonte
-COPY promomonitor/ ./promomonitor/
+FROM python:3.12-slim AS runner
 
-# Instala o pacote raiz promomonitor no ambiente virtual
-RUN uv sync --frozen --no-dev
+WORKDIR /app
 
-# Transfere a propriedade de todo o diretório /app para o usuário seguro
-RUN chown -R appuser:appuser /app
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/false appuser
 
-# Rebaixa os privilégios do container a partir desta linha
-USER appuser
+COPY --from=build /app/.venv /app/.venv
+COPY promomonitor/ /app/promomonitor/
 
-# O CMD invoca o binário gerado na .venv através do executor do uv
-CMD ["uv", "run", "--no-dev", "promomonitor"]
+RUN chown -R 10001:10001 /app
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1\
+    MALLOC_TRIM_THRESHOLD_=65536
+
+USER 10001
+
+ENTRYPOINT ["python", "-m", "promomonitor"]
