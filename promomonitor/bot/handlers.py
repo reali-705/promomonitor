@@ -43,7 +43,12 @@ def _build_alert_message(
     link: str,
     price: float | None = None,
 ) -> str:
-    price_str = f"R$ {price:.2f}" if price is not None else "Não encontrado"
+    if price is not None:
+        price_str = (
+            f"R$ {price:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        )
+    else:
+        price_str = "Não encontrado"
     return (
         f"🚨 **PROMOÇÃO ENCONTRADA**\n\n"
         f"🔍 **Match:** `{matched_term}`\n"
