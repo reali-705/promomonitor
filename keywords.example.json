@@ -1,3 +1,9 @@
-[
-  "exemplo termo"
-]
+{
+  "id_usuario": [
+    "termo 1",
+    "termo 2"
+  ],
+  "id_usuario_2": [
+    "termo 3"
+  ]
+}
