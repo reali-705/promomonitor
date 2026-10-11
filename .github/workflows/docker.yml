@@ -2,7 +2,14 @@ name: Build and Publish to GHCR
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - 'promomonitor/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.dockerignore'
 
 jobs:
   build-and-push:
