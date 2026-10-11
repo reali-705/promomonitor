@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     API_HASH: str
     SESSION_NAME: str = "promomonitor"
     STORAGE_PATH: Path = Path("keywords.json")
+    BOT_TOKEN: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
