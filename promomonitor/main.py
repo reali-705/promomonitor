@@ -19,7 +19,7 @@ async def _run_bot() -> None:
     logger.info("Iniciando handshake com a rede do Telegram...")
     async with client:
         logger.info("Conexão estabelecida. O PromoMonitor está em escuta passiva.")
-        await client.run_until_disconnected()
+        await client.run_until_disconnected()  # pyright: ignore[reportGeneralTypeIssues]
 
 
 def cli() -> None:

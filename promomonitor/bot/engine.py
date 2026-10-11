@@ -10,7 +10,7 @@ class MatchEngine:
     Ignora a origem dos dados, trabalhando estritamente com primitivas em memória.
     """
 
-    PRICE_REGEX = re.compile(r"(?i)(?:R\$)\s?(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)")
+    PRICE_REGEX = re.compile(r"(?i)(?:R\$)\s?(\d{1,3}(?:\.?\d{3})*(?:,\d{2})?)")
 
     def __init__(self) -> None:
         self._compiled_regex: re.Pattern[str] | None = None

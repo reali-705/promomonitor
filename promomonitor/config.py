@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     )
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """Retorna uma instância única (singleton em cache) das configurações validadas."""
     return Settings()  # pyright: ignore[reportCallIssue]

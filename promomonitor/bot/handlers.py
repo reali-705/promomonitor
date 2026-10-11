@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Protocol, TypeGuard
+from typing import Any, Protocol, TypeGuard, cast
 
 from telethon import TelegramClient
 from telethon.events import NewMessage
@@ -23,9 +23,6 @@ def _add(text: str, storage: KeywordStorage, engine: MatchEngine) -> str:
     if inserted:
         invalid_regex = engine.compile(storage.get_all())
         if invalid_regex:
-            for invalid in invalid_regex:
-                storage.remove(invalid)
-                inserted.remove(invalid)
             msg.append(
                 "❌ **ERRO DE REGEX:** Termos rejeitados pelo "
                 f"compilador: {', '.join(invalid_regex)}"
@@ -34,7 +31,6 @@ def _add(text: str, storage: KeywordStorage, engine: MatchEngine) -> str:
         msg.append(f"✅ **Adicionados e Compilados:** `{', '.join(inserted)}`")
     if ignored:
         msg.append(f"🔄 **Ignorados (Já existiam):** `{', '.join(ignored)}`")
-
     return "\n".join(msg)
 
 
@@ -81,12 +77,12 @@ async def _extract_chat_metadata(event: NewMessage.Event) -> tuple[str, str]:
     Extrai título e link executando I/O apenas uma vez e calculando
     os IDs em O(1) na memória.
     """
-    raw_chat: Any = await event.get_chat()
+    raw_chat: Any = cast(Any, await event.get_chat())
     if _is_chat_with_title(raw_chat) and raw_chat.title.strip():
         chat_title = raw_chat.title.strip()
     else:
         chat_title = "Desconhecido"
-    chat_id = event.chat_id
+    chat_id = cast(int | None, event.chat_id)  # pyright: ignore[reportUnknownMemberType]
     if isinstance(chat_id, int):
         clean_id = str(chat_id).removeprefix("-100")
         link = (
@@ -96,7 +92,6 @@ async def _extract_chat_metadata(event: NewMessage.Event) -> tuple[str, str]:
         )
     else:
         link = "Sem link"
-
     return chat_title, link
 
 
@@ -104,7 +99,6 @@ def _build_alert_message(
     matched_term: str,
     chat_title: str,
     link: str,
-    snippet: str,
     price: float | None = None,
 ) -> str:
     """
@@ -116,7 +110,6 @@ def _build_alert_message(
         f"💰 **Preço:** {price_str}\n"
         f"📍 **Origem:** {chat_title}\n"
         f"🔗 **Link:** {link}\n\n"
-        f"📝 **Snippet:**\n{snippet[:300]}..."
     )
 
 
@@ -160,7 +153,6 @@ def register_handlers(
             matched_term=matched_term,
             chat_title=chat_title,
             link=link,
-            snippet=text,
             price=engine.extract_price(text),
         )
         await client.send_message("me", alert_payload)

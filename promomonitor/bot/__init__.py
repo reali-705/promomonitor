@@ -22,8 +22,6 @@ if invalid_terms:
         len(invalid_terms),
         invalid_terms,
     )
-    for invalid in invalid_terms:
-        storage.remove(invalid)
 
 client = TelegramClient(
     settings.SESSION_NAME,
